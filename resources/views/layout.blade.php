@@ -91,7 +91,7 @@
         <script type="">
             $.blockUI.defaults = { 
                 // message displayed when blocking (use null for no message) 
-                message:  '<img src="{{ url("public/img/Preloader_3.gif") }}"/><button type="button" class="close" onclick="$.unblockUI();" aria-label="Close"><span aria-hidden="true">&times;</span></button>', 
+                message:  '{!! tagImage(url("public/img/Preloader_3.gif"),0) !!}<button type="button" class="close" onclick="$.unblockUI();" aria-label="Close"><span aria-hidden="true">&times;</span></button>', 
 
                 title: null,        // title string; only used when theme == true 
                 draggable: true,    // only used when theme == true (requires jquery-ui.js to be loaded) 

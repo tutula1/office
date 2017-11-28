@@ -48,8 +48,8 @@ class JobsController extends Controller {
         $job->description = $request->get('description');
         $job->status = Job::STATUS_ENABLE;
         $job->date_done = $request->get('date_done');
-        $job->no_date_done = isset($request->get('no_date_done')) ? 1 : 0;
-        $job->urgent = isset($request->get('urgent')) ? 1 : 0;
+        $job->no_date_done = $request->get('no_date_done') ? 1 : 0;
+        $job->urgent = $request->get('urgent') ? 1 : 0;
     
         $job->save();
         
@@ -99,8 +99,8 @@ class JobsController extends Controller {
         $job->description = $request->get('description');
         $job->status = Job::STATUS_ENABLE;
         $job->date_done = $request->get('date_done');
-        $job->no_date_done = isset($request->get('no_date_done')) ? 1 : 0;
-        $job->urgent = isset($request->get('urgent')) ? 1 : 0;
+        $job->no_date_done = $request->get('no_date_done') ? 1 : 0;
+        $job->urgent = $request->get('urgent') ? 1 : 0;
         
         $user->save();
         

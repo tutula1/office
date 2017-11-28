@@ -52,11 +52,16 @@
             if ($permissionName == '') {
                 return false;
             }
-            if(\Cache::has('permissions')) {
-                $permissions = \Cache::get('permissions');
-            } else {
+            if(\Session::get('expiresAt') == 0){
+                \Cache::forget('permissions');
                 $permissions = $this->role->permissions()->get();
-                \Cache::put('permissions', $permissions, \Session::get('expiresAt', 10));
+            } else {
+                if(\Cache::has('permissions')) {
+                    $permissions = \Cache::get('permissions');
+                } else {
+                    $permissions = $this->role->permissions()->get();
+                    \Cache::put('permissions', $permissions, \Session::get('expiresAt', 10));
+                }
             }
             foreach ($permissions as $permission) {
                 if ($permission->name == $permissionName) {

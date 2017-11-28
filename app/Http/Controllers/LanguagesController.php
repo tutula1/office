@@ -14,21 +14,37 @@
         *
         * @return Response
         */
-        public function index()
+        public function index(Request $request)
         {
             $breadcrumbs = new \Creitive\Breadcrumbs\Breadcrumbs;
-            $breadcrumbs->setDivider('');
-            $breadcrumbs->setListElement('ol');
-            $breadcrumbs->setCssClasses('breadcrumb');
-            $breadcrumbs->addCrumb(\Lang::get('lang.menu.home'), url('/'));
-            $breadcrumbs->addCrumb(\Lang::get('lang.menu.languages'), url('languages'));
-            \Session::put('breadcrumbs', $breadcrumbs);
-            $languages = Language::groupBy("group")->get();
-            foreach ($languages as $language) {
-                $language->language = Language::where("group", $language->group)->get();
+            $this->setBreadcrumbs([
+                [
+                    'name' => \Lang::get('lang.menu.home'),
+                    'url' =>url('/')
+                ],
+                [
+                    'name' => \Lang::get('lang.menu.languages'),
+                    'url' =>url('languages')
+                ],
+            ]);
+            $languages = Language::select("id", "name", "group", "vi", "en");
+            $name = '';
+            $vi = '';
+            $en = '';
+            if($request->name){
+                $name = $request->name;
+                $languages = $languages->where('name', 'like', '%'.$name.'%');
             }
-
-            return view('languages.index', compact('languages'));
+            if($request->vi){
+                $vi = $request->vi;
+                $languages = $languages->where('vi', 'like', '%'.$vi.'%');
+            }
+            if($request->en){
+                $en = $request->en;
+                $languages = $languages->where('en', 'like', '%'.$en.'%');
+            }
+            $languages = $languages->paginate($this->paginate)->appends(['name' => $name, 'vi' => $vi, 'en' => $en]);
+            return view('languages.index', compact('languages', 'name', 'vi', 'en'));
         }
 
         /**
@@ -39,13 +55,20 @@
         public function create()
         {
             $breadcrumbs = new \Creitive\Breadcrumbs\Breadcrumbs;
-            $breadcrumbs->setDivider('');
-            $breadcrumbs->setListElement('ol');
-            $breadcrumbs->setCssClasses('breadcrumb');
-            $breadcrumbs->addCrumb(\Lang::get('lang.menu.home'), url('/'));
-            $breadcrumbs->addCrumb(\Lang::get('lang.menu.languages'), url('languages'));
-            $breadcrumbs->addCrumb(\Lang::get('lang.menu.languages.create'), url('languages/create'));
-            \Session::put('breadcrumbs', $breadcrumbs);
+            $this->setBreadcrumbs([
+                [
+                    'name' => \Lang::get('lang.menu.home'),
+                    'url' =>url('/')
+                ],
+                [
+                    'name' => \Lang::get('lang.menu.languages'),
+                    'url' =>url('languages')
+                ],
+                [
+                    'name' => \Lang::get('lang.menu.languages.create'),
+                    'url' =>url('languages/create')
+                ],
+            ]);
             return view('languages.create');
         }
 

@@ -13,11 +13,7 @@
         <link rel="stylesheet" href="{{ url('public/css/style.css') }}">
     </head>
     <body>
-
-
-
         <div class="container-fluid">
-
             <div class="row">
                 @if (Auth::guest())
                 @include('partials.nav')
@@ -28,10 +24,10 @@
                     Copyright ©2017, Duong Quang Binh
                 </footer>
                 @else
-                <div class="col-md-3">
+                <div class="col-md-3 col-sm-3">
                     @include('partials.menu')
                 </div>
-                <div class="col-md-9">
+                <div class="col-md-9 col-sm-9">
                     @include('partials.nav')
                     @include('partials.flash')
                     @if(Session::has('breadcrumbs')){!! Session::get('breadcrumbs')->render() !!}@endif
@@ -40,13 +36,11 @@
                         <hr />
                         Copyright ©2017, Duong Quang Binh
                     </footer>
+                    {{ var_dump(Session::all()) }}
                 </div>
                 @endif
             </div>
-
         </div>
-
-
         <script src="{{ url('public/js/jquery.min.js') }}"></script>
         <script src="{{ url('public/js/jquery-migrate.min.js') }}"></script>
         <script src="{{ url('public/js/jquery.blockui.min.js') }}"></script>
@@ -381,6 +375,24 @@
 
         @yield('footer')
 
+        <script>
+            (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+                (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+                m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+            })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+            ga('create', 'UA-110120848-1', 'auto');
+            ga('send', 'pageview');
+
+
+            $("button").click(function(event) {
+                ga('send', 'event', {
+                    eventCategory: 'Button click',
+                    eventAction: $(this).html(),
+                    eventLabel: '{{ Request::url() }}'
+                });
+            });
+        </script>
 
     </body>
 </html>

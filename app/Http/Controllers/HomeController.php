@@ -12,9 +12,10 @@ class HomeController extends Controller {
 	 *
 	 * @return Response
 	 */
-	public function index()
+	public function index(Request $request)
 	{
-		return view('index');
+        $s = $request->s;
+		return view('index', compact('s'));
 	}
 
 	/**

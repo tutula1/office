@@ -17,9 +17,13 @@
             </ul>
             <form action="{{ url('') }}" class="navbar-form navbar-left hidden-xs">
                 <div class="form-group">
-                    <input type="text" class="form-control" placeholder="Search" name="s" />
+                    <div class="input-group">
+                        <input type="text" class="form-control" placeholder="Search" name="s" @if(isset($s)) value="{{ $s }}" @endif/>
+                        <span class="input-group-btn">
+                            <button class="btn btn-default" type="submit"><i class="fa fa-search"></i></button>
+                        </span>
+                    </div><!-- /input-group -->
                 </div>
-                <button type="submit" class="btn btn-default">Submit</button>
             </form>
             @endif
             <ul class="nav navbar-nav navbar-right">
@@ -50,9 +54,9 @@
 </nav>
 <form action="{{ url('') }}" class="navbar-form visible-xs">
     <div class="input-group">
-        <input type="text" class="form-control" placeholder="Search" name="s" />
+        <input type="text" class="form-control" placeholder="Search" name="s" @if(isset($s)) value="{{ $s }}" @endif/>
         <span class="input-group-btn">
-            <button class="btn btn-default" type="submit">Submit</button>
+            <button class="btn btn-default" type="submit"><i class="fa fa-search"></i></button>
         </span>
     </div><!-- /input-group -->
 </form>

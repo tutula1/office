@@ -33,19 +33,30 @@
         */
         public function handle($request, Closure $next)
         {
-            if (!\Session::has('locale')) {
-                \Session::put('locale', 'vi');
+            $config = \App\Config::select('value')->where('key', 'expiresAt')->first();
+            if(!$config){
+                $expiresAt = 0;
+            } else {
+                $expiresAt = $config['value'];
             }
-            \App::setLocale(\Session::get('locale'));
-            \Session::put('expiresAt', 0);
+            \Session::put('expiresAt', $expiresAt);
             $actions = [];
             $controllers = [];
+            $user_ids = [0];
+            $user_id = 0;
             if ( $request->user()) {
-                if(\Cache::has('permissions')) {
-                    $permissions = \Cache::get('permissions');
+                $user_ids[] = $request->user()->id;
+                $user_id = $request->user()->id;
+                if($expiresAt == 0){
+                    \Cache::forget('permissions');
+                    $permissions = $request->user()->role->permissions()->orderBy('group', 'ASC')->orderBy('name', 'ASC')->get();
                 } else {
-                    $permissions = $request->user()->role->permissions()->get();
-                    \Cache::put('permissions', $permissions, \Session::get('expiresAt', 10));
+                    if(\Cache::has('permissions')) {
+                        $permissions = \Cache::get('permissions');
+                    } else {
+                        $permissions = $request->user()->role->permissions()->orderBy('group', 'ASC')->orderBy('name', 'ASC')->get();
+                        \Cache::put('permissions', $permissions, $expiresAt);
+                    }
                 }
                 foreach ($permissions as $permission) {
                     $actions[] = $permission->name;
@@ -53,9 +64,45 @@
                         $controllers[] = $permission->group;
                     }
                 }
+
             }
-            \Session::put('actions', '|'.join('|', $actions));
-            \Session::put('controllers', '|'.join('|', $controllers));
+            if ($expiresAt != 0) {
+                if(\Cache::has('defaultLanguage')) {
+                    $config = \Cache::get('defaultLanguage');
+                } else {
+                    $config = \App\Config::select('value')->where('key', 'defaultLanguage')->where('user_id', $user_id)->first();
+                    \Cache::put('defaultLanguage', $configs, $expiresAt);
+                }
+            } else { 
+                \Cache::forget('defaultLanguage');
+                $config = \App\Config::select('value')->where('key', 'defaultLanguage')->where('user_id', $user_id)->first();
+            }
+            if(!$config){
+                $defaultLanguage = 'vi';
+                \App\Config::create([
+                    'key' => 'defaultLanguage',
+                    'value' => 'vi',
+                    'user_id' => $user_id
+                ]);
+            } else {
+                $defaultLanguage = $config['value'];
+            }
+            \Session::put('locale', $defaultLanguage);
+            \App::setLocale(\Session::get('locale'));
+            if ($expiresAt != 0) {
+                if(\Cache::has('configs')) {
+                    $configs = \Cache::get('configs');
+                } else {
+                    $configs = \App\Config::select('key', 'value')->whereIn('user_id', $user_ids)->orderBy('user_id', 'DESC')->get();
+                    \Cache::put('configs', $configs, $expiresAt);
+                }
+            } else {
+                \Cache::forget('configs');
+                $configs = \App\Config::select('key', 'value')->whereIn('user_id', $user_ids)->orderBy('user_id', 'DESC')->get();
+            }
+            \Session::put('configs', $configs);
+            \Session::put('actions', $actions);
+            \Session::put('controllers', $controllers);
             \Session::forget('breadcrumbs');
             return $next($request);
         }

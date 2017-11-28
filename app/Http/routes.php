@@ -10,9 +10,17 @@
     | and give it the controller to call when that URI is requested.
     |
     */
-    Route::get('language/{locale}', function ($locale) {
+    Route::get('language/{locale}', function (\Illuminate\Http\Request $request, $locale) {
         if($locale != 'en' && $locale != 'vi'){
             $locale = 'vi';
+        }
+        if($request->user()){
+            $user_id = $request->user()->id;
+            if ($user_id){
+                \App\Config::where('user_id', $user_id)->where('key', 'defaultLanguage')->update([
+                    'value' => $locale,
+                ]);
+            }
         }
         \Session::put('locale', $locale);
         App::setLocale($locale);
@@ -48,6 +56,9 @@
             });
             Route::group(['permission' => 'cache'], function(){
                 Route::resource('cache', 'CacheController');
+            });
+            Route::group(['permission' => 'configs'], function(){
+                Route::resource('configs', 'ConfigsController');
             });
         });
         Route::controllers([
